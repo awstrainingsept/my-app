@@ -1,87 +1,20 @@
-  pipeline{
-      agent any
-      stages{
-          stage('SCM Checkout'){
-              steps{  git 'https://github.com/awstrainingsept/my-app' 
-              }
-   
+node{
+   stage('SCM Checkout'){
+     git 'https://github.com/awstrainingsept/my-app'
    }
    stage('Compile-Package'){
-       steps{sh "mvn package"}
-      
+      // Get maven home path 
+      sh "mvn package"
    }
    
    stage('SonarQube Analysis') {
-       steps{ withSonarQubeEnv('SonarQube') { 
+        withSonarQubeEnv('SonarQube') { 
           sh "mvn sonar:sonar"
-        }}
-       
+        }
     }
-      }
-   post {
-        success {
-            emailext (
-                subject: "SUCCESSFUL: Job '${env.JOB_NAME} - Build # ${env.BUILD_NUMBER}'",
-                mimeType: "text/html",
-                to: "awstraining.sept@gmail.com"
-                  
-            )
-        }
-
-        failure {
-            emailext (
-                subject: "FAILED: Job '${env.JOB_NAME} - Build # ${env.BUILD_NUMBER}'",
-                mimeType: "text/html",
-                body: """<p>FAILED: Job '${env.JOB_NAME} - Build # ${env.BUILD_NUMBER}':</p>
-                    <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} - Build # ${env.BUILD_NUMBER}</a>&QUOT;</p>""",
-                to: "awstraining.sept@gmail.com"
-            )
-        }
-        unstable {
-            emailext (
-                subject: "UNSTABLE: Job '${env.JOB_NAME} - Build # ${env.BUILD_NUMBER}'",
-                mimeType: "text/html",
-                body: """<p>UNSTABLE: Job '${env.JOB_NAME} - Build # ${env.BUILD_NUMBER}':</p>
-                    <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} - Build # ${env.BUILD_NUMBER}</a>&QUOT;</p>""",
-                to: "awstraining.sept@gmail.com"            )
-        }
-       always {
-                cleanWs()
-        }
-    
-    }
-    // post {
-    //     always {
-    //             cleanWs()
-    //     }
-    //     success {
-    //         script {
-    //             if (SEND_EMAIL_ALERTS == 'true') {
-    //                 emailext (
-    //                     subject: "Deployed: ${deployEnv} - ${PRODUCT_DOMAIN} ${PRODUCT_NAME} - Build # ${env.BUILD_NUMBER}'",
-    //                     mimeType: "text/html",
-    //                     body: """<p>Successfully Deployed: Job '${env.JOB_NAME} - Build # ${env.BUILD_NUMBER}'</p>
-    //                         <p>Branch: ${SCM_BRANCH} Commit: ${gitInfo.GIT_COMMIT} Author: ${env.CHANGE_AUTHOR}</p>
-    //                     """,
-    //                     to: "${EMAIL_RECIP}"
-    //                 )
-    //             }
-    //         }
-    //     }
-    //     failure {
-    //         script {
-    //             if (SEND_EMAIL_ALERTS == 'true') {
-    //                 emailext (
-    //                     subject: "Failure: ${deployEnv} - ${PRODUCT_DOMAIN} ${PRODUCT_NAME} - Build # ${env.BUILD_NUMBER}'",
-    //                     mimeType: "text/html",
-    //                     body: """<p>Failed Deployment: Job '${env.JOB_NAME} - Build # ${env.BUILD_NUMBER}'</p>
-    //                         <p>Branch: ${SCM_BRANCH} Commit: ${gitInfo.GIT_COMMIT} Author: ${env.CHANGE_AUTHOR}</p>
-    //                     """,
-    //                     to: "${EMAIL_RECIP}"
-    //                 )
-    //             }
-    //         }
-    //     }
-    // }
-}
-
+    stage('Email Notification'){
+      mail bcc: '', body: '''Hi Welcome to jenkins email alerts
+      Thanks
+      Vinay''', cc: '', from: '', replyTo: '', subject: 'Jenkins Job', to: 'awstraining.sept@gmail.com'
+   }
+   }
