@@ -2,17 +2,20 @@
       agent any
       stages{
           stage('SCM Checkout'){
-     git 'https://github.com/awstrainingsept/my-app'
+              steps{  git 'https://github.com/awstrainingsept/my-app' 
+              }
+   
    }
    stage('Compile-Package'){
-      // Get maven home path 
-      sh "mvn package"
+       steps{sh "mvn package"}
+      
    }
    
    stage('SonarQube Analysis') {
-        withSonarQubeEnv('SonarQube') { 
+       steps{ withSonarQubeEnv('SonarQube') { 
           sh "mvn sonar:sonar"
-        }
+        }}
+       
     }
       }
    post {
