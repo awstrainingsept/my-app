@@ -1,5 +1,7 @@
-node{
-   stage('SCM Checkout'){
+  pipeline{
+      agent any
+      stages{
+          stage('SCM Checkout'){
      git 'https://github.com/awstrainingsept/my-app'
    }
    stage('Compile-Package'){
@@ -12,7 +14,7 @@ node{
           sh "mvn sonar:sonar"
         }
     }
-   
+      }
    post {
         success {
             emailext (
@@ -81,3 +83,4 @@ node{
     //     }
     // }
 }
+
