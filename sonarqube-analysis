@@ -13,9 +13,71 @@ node{
         }
     }
    
-   stage('Email Notification'){
-      mail bcc: '', body: """<p>URL: Job '${env.JOB_NAME} - Build # ${env.BUILD_NUMBER}':</p>
-                    <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} - Build # ${env.BUILD_NUMBER}</a>&QUOT;</p>"""
-                    , cc: '', from: '', replyTo: '', subject: 'Jenkins Job', to: 'awstraining.sept@gmail.com'
-   }
+   post {
+        success {
+            emailext (
+                subject: "SUCCESSFUL: Job '${env.JOB_NAME} - Build # ${env.BUILD_NUMBER}'",
+                mimeType: "text/html",
+                body: """<p>SUCCESSFUL: Job '${env.JOB_NAME} - Build # ${env.BUILD_NUMBER}':</p>
+                    <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} - Build # ${env.BUILD_NUMBER}</a>&QUOT;</p>""",
+                to: "awstraining.sept@gmail.com"
+                  
+            )
+        }
+
+        failure {
+            emailext (
+                subject: "FAILED: Job '${env.JOB_NAME} - Build # ${env.BUILD_NUMBER}'",
+                mimeType: "text/html",
+                body: """<p>FAILED: Job '${env.JOB_NAME} - Build # ${env.BUILD_NUMBER}':</p>
+                    <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} - Build # ${env.BUILD_NUMBER}</a>&QUOT;</p>""",
+                to: "awstraining.sept@gmail.com"
+            )
+        }
+        unstable {
+            emailext (
+                subject: "UNSTABLE: Job '${env.JOB_NAME} - Build # ${env.BUILD_NUMBER}'",
+                mimeType: "text/html",
+                body: """<p>UNSTABLE: Job '${env.JOB_NAME} - Build # ${env.BUILD_NUMBER}':</p>
+                    <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} - Build # ${env.BUILD_NUMBER}</a>&QUOT;</p>""",
+                to: "awstraining.sept@gmail.com"            )
+        }
+       always {
+                cleanWs()
+        }
+    
+    }
+    // post {
+    //     always {
+    //             cleanWs()
+    //     }
+    //     success {
+    //         script {
+    //             if (SEND_EMAIL_ALERTS == 'true') {
+    //                 emailext (
+    //                     subject: "Deployed: ${deployEnv} - ${PRODUCT_DOMAIN} ${PRODUCT_NAME} - Build # ${env.BUILD_NUMBER}'",
+    //                     mimeType: "text/html",
+    //                     body: """<p>Successfully Deployed: Job '${env.JOB_NAME} - Build # ${env.BUILD_NUMBER}'</p>
+    //                         <p>Branch: ${SCM_BRANCH} Commit: ${gitInfo.GIT_COMMIT} Author: ${env.CHANGE_AUTHOR}</p>
+    //                     """,
+    //                     to: "${EMAIL_RECIP}"
+    //                 )
+    //             }
+    //         }
+    //     }
+    //     failure {
+    //         script {
+    //             if (SEND_EMAIL_ALERTS == 'true') {
+    //                 emailext (
+    //                     subject: "Failure: ${deployEnv} - ${PRODUCT_DOMAIN} ${PRODUCT_NAME} - Build # ${env.BUILD_NUMBER}'",
+    //                     mimeType: "text/html",
+    //                     body: """<p>Failed Deployment: Job '${env.JOB_NAME} - Build # ${env.BUILD_NUMBER}'</p>
+    //                         <p>Branch: ${SCM_BRANCH} Commit: ${gitInfo.GIT_COMMIT} Author: ${env.CHANGE_AUTHOR}</p>
+    //                     """,
+    //                     to: "${EMAIL_RECIP}"
+    //                 )
+    //             }
+    //         }
+    //     }
+    // }
 }
