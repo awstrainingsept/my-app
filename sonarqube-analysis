@@ -16,6 +16,6 @@ node{
    stage('Email Notification'){
       mail bcc: '', body: '''Hi Welcome to jenkins email alerts
       Thanks
-      Hari''', cc: '', from: '', replyTo: '', subject: 'Jenkins Job', to: 'vinay.ylr@gmail.com'
+      Vinay''', cc: '', from: '', replyTo: '', subject: 'Jenkins Job', to: 'awstraining.sept@gmail.com'
    }
 }
